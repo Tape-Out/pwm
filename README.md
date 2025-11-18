@@ -1,0 +1,5 @@
+开始采用：
+- RO - READ ONLY
+- WO - WRITE ONLY
+- RW - READ WRITE
+- TP - TEMP WIRE OR REG - DEFAULT - 默认不加
