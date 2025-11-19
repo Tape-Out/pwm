@@ -16,7 +16,7 @@
 `endif
 
 module pwm_mmio #(
-    parameter [31:0]  BASE_ADDR     = 32'h8000_2000,
+    parameter [31:0]  BASE_ADDR     = 32'h8100_2000,
     parameter [31:0]  CLK_FREQ      = 32'd100_000_000,      // 100MHz clock
     parameter integer DEFAULT_FREQ  = `PWM_DEFAULT_FREQ,    // Default PWM frequency
     parameter integer MAX_CHANNELS  = `PWM_MAX_CHANNELS     // Number of PWM channels
@@ -53,6 +53,9 @@ module pwm_mmio #(
 
     // 1: pwm channel${i} is enabled
     wire [MAX_CHANNELS-1:0] ctrl_ch_en = ctrl_reg[8+:MAX_CHANNELS];
+
+    wire [31:0] wmask = { {8{mem_wstrb[3]}}, {8{mem_wstrb[2]}}, {8{mem_wstrb[1]}}, {8{mem_wstrb[0]}} };
+    wire [31:0] wdata = mem_wdata & wmask;
 
     always @(*) begin
         if (freq_reg == 0)
@@ -100,15 +103,20 @@ module pwm_mmio #(
         end
     end
 
+    always @(posedge clk) begin
+        if (!resetn) begin
+            mem_ready <= 0;
+        end
+        mem_ready <= mem_valid && !mem_instr;
+    end
+
     integer chan;
 
     always @(posedge clk) begin: MMIO_READ
         if (!resetn) begin
             mem_rdata <= 0;
-            mem_ready <= 0;
         end else begin
             if (mem_valid && (!mem_instr) && mem_wstrb == 0) begin
-                mem_ready <= 1;
                 case (mem_addr)
                     RW_REG_CTRL:    mem_rdata <= ctrl_reg;
                     RO_REG_STATUS:  mem_rdata <= status_reg;
@@ -129,7 +137,6 @@ module pwm_mmio #(
                 endcase
             end else begin
                 mem_rdata <= 0;
-                mem_ready <= 0;
             end
         end
     end
@@ -145,21 +152,18 @@ module pwm_mmio #(
             end
         end else begin
             if (mem_valid && (!mem_instr) && mem_wstrb != 0) begin
-                mem_ready <= 1;
                 case(mem_addr)
-                    RW_REG_CTRL:    ctrl_reg <= mem_wdata;
-                    RW_REG_FREQ:    freq_reg <= mem_wdata;
+                    RW_REG_CTRL:    ctrl_reg <= wdata;
+                    RW_REG_FREQ:    freq_reg <= wdata;
                     default: begin: WRITE_DUTY_CYCLE
                         if (mem_addr >= RW_REG_DUTY_BASE &&
                             mem_addr < RW_REG_DUTY_BASE + (MAX_CHANNELS * 4)) begin
                             channel = (mem_addr - RW_REG_DUTY_BASE) >> 2;
                             if (channel < MAX_CHANNELS)
-                                duty_cycle[channel] <= mem_wdata;
+                                duty_cycle[channel] <= wdata;
                         end
                     end
                 endcase
-            end else begin
-                mem_ready <= 0;
             end
         end
     end
