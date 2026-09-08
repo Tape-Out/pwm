@@ -31,6 +31,13 @@ features:
   deadtime:
     type: bool
     default: false
+    area:
+      points:
+        '1': 247.8
+        '2': 494.76
+        '4': 630.0
+        '8': 1128.68
+      per: channels
 emit:
 - kind: bsv
   package: Pwm
@@ -48,3 +55,58 @@ emit:
 deps:
   hwcore: ^0.1
   amba: ^0.1
+area:
+  base:
+    points:
+      '1': 1489.6
+      '2': 1698.76
+      '4': 2254.56
+      '8': 3361.4
+    per: channels
+  margin: 0.0311
+  model: points-additive
+  error:
+    bound: 0.053
+    sign: over
+    note: parameter curves stored as measured points, features added on top, then
+      lifted by 0.0311 so that no untested combination predicts under; the worst came
+      in 2.61 percent under before the lift
+  measured:
+  - at:
+      channels: 1
+      deadtime: false
+    um2: 1489.6
+  - at:
+      channels: 2
+      deadtime: false
+    um2: 1698.76
+  - at:
+      channels: 4
+      deadtime: false
+    um2: 2254.56
+  - at:
+      channels: 8
+      deadtime: false
+    um2: 3361.4
+  - at:
+      channels: 1
+      deadtime: true
+    um2: 1737.4
+  - at:
+      channels: 2
+      deadtime: true
+    um2: 2193.52
+  - at:
+      channels: 4
+      deadtime: true
+    um2: 2884.56
+  - at:
+      channels: 8
+      deadtime: true
+    um2: 4490.08
+  corner:
+    tool: ecc
+    pdk: ics55
+    freq_mhz: 100
+    measured: '2026-09-08'
+    gen_digest: sha256:c74097842c79c997
