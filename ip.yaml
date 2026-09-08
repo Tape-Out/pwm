@@ -1,0 +1,29 @@
+name: pwm
+version: 0.1.0
+spec: "0.1"
+kind: ip
+lang: bsv
+identity:
+  slug: pwm-tapeout-bsv
+  display_name: Pulse-width modulator
+  summary: Configurable channels with dead time.
+  category: peripheral
+  subcategories: [pwm]
+  ip_family: pwm
+  integration_profile: [apb4-slave]
+  maturity: planned
+contract:
+  version: 1
+  ctrl: { shape: flat, aw: 8, dw: 32 }
+params:
+  channels: { type: int, default: 4, range: [1, 8] }
+features:
+  deadtime: { type: bool, default: false }
+emit:
+  - kind: bsv
+    package: Pwm
+    module: mkPwm
+    config_type: PwmCfg
+    interface: PwmIfc
+deps:
+  hwcore: "^0.1"

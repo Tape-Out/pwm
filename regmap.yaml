@@ -1,0 +1,27 @@
+ip: pwm
+contract: { aw: 8, dw: 32 }
+base: 0x10003000
+size: 0x100
+params: [channels]
+regs:
+  - name: ctrl
+    offset: 0x00
+    desc: control
+    fields:
+      - { name: en,    bits: "0:0",   sw: rw, hw: r, reset: 0 }
+      - { name: align, bits: "1:1",   sw: rw, hw: r, reset: 0 }
+      - { name: presc, bits: "19:4",  sw: rw, hw: r, reset: 0 }
+  - name: period
+    offset: 0x04
+    desc: period
+    fields: [ { name: val, width: 16, sw: rw, hw: r, reset: 0 } ]
+  - name: duty
+    offset: 0x10
+    desc: duty per channel
+    array: { count: channels, stride: 4 }
+    fields: [ { name: val, width: 16, sw: rw, hw: r, reset: 0 } ]
+  - name: dead
+    offset: 0x40
+    desc: dead time
+    feature: deadtime
+    fields: [ { name: val, width: 8, sw: rw, hw: r, reset: 0 } ]
