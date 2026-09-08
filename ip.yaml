@@ -1,6 +1,6 @@
 name: pwm
 version: 0.1.0
-spec: "0.1"
+spec: '0.1'
 kind: ip
 lang: bsv
 identity:
@@ -8,22 +8,43 @@ identity:
   display_name: Pulse-width modulator
   summary: Configurable channels with dead time.
   category: peripheral
-  subcategories: [pwm]
+  subcategories:
+  - pwm
   ip_family: pwm
-  integration_profile: [apb4-slave]
+  integration_profile:
+  - apb4-slave
   maturity: planned
 contract:
   version: 1
-  ctrl: { shape: flat, aw: 8, dw: 32 }
+  ctrl:
+    shape: flat
+    aw: 8
+    dw: 32
 params:
-  channels: { type: int, default: 4, range: [1, 8] }
+  channels:
+    type: int
+    default: 4
+    range:
+    - 1
+    - 8
 features:
-  deadtime: { type: bool, default: false }
+  deadtime:
+    type: bool
+    default: false
 emit:
-  - kind: bsv
-    package: Pwm
-    module: mkPwm
-    config_type: PwmCfg
-    interface: PwmIfc
+- kind: bsv
+  package: Pwm
+  module: mkPwm
+  config_type: PwmCfg
+  interface: PwmIfc
+  ctrl: regs
+  pins:
+  - name: pins
+    type: PwmPins
+    targs:
+    - channels
+- kind: verilog-flat
+  bus: apb4
 deps:
-  hwcore: "^0.1"
+  hwcore: ^0.1
+  amba: ^0.1
