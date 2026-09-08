@@ -4,6 +4,13 @@ import Vector::*;
 import RegIf::*;
 import PwmRegs::*;
 
+// 恒零的只读寄存器：特性关掉时占位，写进去什么也不发生，综合器整片消掉
+function Reg#(t) roReg(t v) =
+  interface Reg;
+    method t _read = v;
+    method Action _write(t x) = noAction;
+  endinterface;
+
 // 本包不认识任何总线：对外只给中立的 RegIf，接哪种总线由 wrap 或装配决定。
 typedef struct {
   Bool deadtime;
@@ -55,10 +62,15 @@ module mkPwm#(PwmCfg cfg)(PwmIfc#(aw, dw, channels))
     return o;
   endfunction
 
-  Vector#(channels, Reg#(Bit#(8))) dz   <- replicateM(mkReg(0));
-  Reg#(Bit#(channels))             prev <- mkReg(0);
+  // 关掉死区就真的不例化这些寄存器。只挡规则是不够的——模块还在，
+  // 综合器留着它的复位逻辑，特性看起来免费其实一直在付钱（hart 的 M 扩展
+  // 就是这么量出 98 µm² 这个假数的）。
+  Vector#(channels, Reg#(Bit#(8))) dz = replicate(roReg(0));
+  Reg#(Bit#(channels))             prev = roReg(0);
 
   if (cfg.deadtime) begin
+    dz   <- replicateM(mkReg(0));
+    prev <- mkReg(0);
     // 换向的一瞬两路都关掉，关满 dead 拍再放行。上下桥直通烧管子就是这么来的。
     rule guard;
       let raw = rawOut();
