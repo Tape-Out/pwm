@@ -10,6 +10,7 @@ regs:
     fields:
       - { name: en,    bits: "0:0",   sw: rw, hw: r, reset: 0 }
       - { name: align, bits: "1:1",   sw: rw, hw: r, reset: 0 }
+      - { name: imm,   bits: "2:2",   sw: rw, hw: r, reset: 0 }
       - { name: presc, bits: "19:4",  sw: rw, hw: r, reset: 0 }
   - name: period
     offset: 0x04
