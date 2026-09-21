@@ -52,7 +52,7 @@ txt = f'''package Pwm{label}Tb;
 import RegIf::*;
 import Pwm::*;
 
-// 由 tb/mkpwmtb.py 生成，勿手改。这一点：channels={chans} deadtime={dead}
+// 由 htest/mkpwmtb.py 生成，勿手改。这一点：channels={chans} deadtime={dead}
 
 typedef enum {{ Setup, Low, SetHigh, High, SetMid, Mid, Check,
                SetGlit, ArmGlit, ChkGlit, SetImm, ArmImm, ChkImm,
